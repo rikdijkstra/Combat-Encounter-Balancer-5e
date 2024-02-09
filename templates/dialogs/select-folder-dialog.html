@@ -1,28 +1,10 @@
-let folderOptions = Object.entries(game.settings.get('combat-encounter-balancer-5e', 'folderPaths')).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
-
-let dialogContent = '
-  <form>
-    <div class="form-group">
-      <label>Select Enemy Folder:</label>
-      <select id="folder-select">${folderOptions}</select>
-    </div>
-    <div class="form-group">
-        <label>Select Allies Folder:</label>
-        <select id="folder-select">${folderOptions}</select>
-    </div>
-  </form>
-';
-
-new Dialog({
-  title: "Select Encounter Folders",
-  content: dialogContent,
-  buttons: {
-    ok: {
-      label: "Select",
-      callback: (html) => {
-        const selectedFolder = html.find("#folder-select").val();
-        // Now you can use selectedFolder to read files from the server
-      }
-    }
-  }
-}).render(true);
+<form>
+<div class="form-group">
+    <label>Select Enemy Folder:</label>
+    <select id="enemy-folder-select">${folderOptions}</select>
+</div>
+<div class="form-group">
+    <label>Select Ally Folder:</label>
+    <select id="ally-folder-select">${folderOptions}</select>
+</div>
+</form>

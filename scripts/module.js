@@ -38,14 +38,17 @@ async function openCustomDialog() {
     console.log("CEB5e | openCustomDialog() called")
     const templatePath = "modules/combat-encounter-balancer-5e/templates/dialogs/select-folder-dialog.html";
     const templateHtml = await fetch(templatePath).then(response => response.text()).catch(err => console.error(err));        console.log("openCustomDialog() called")
+    let folderOptions = Object.entries(game.settings.get('combat-encounter-balancer-5e', 'folderPaths')).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
+    dialogContent = dialogContent.replace(/\$\{folderOptions\}/g, folderOptions);
     let dialog = new Dialog({
-        title: "Select Folder",
+        title: "Select Encounter Folders",
         content: templateHtml,
         buttons: {
             select: {
             label: "Select",
             callback: html => {
-                // Handle selection
+                const selectedEnemyFolder = html.find("#enemy-folder-select").val();
+                const selectedAllyFolder = html.find("#ally-folder-select").val();
             }
             }
         },
