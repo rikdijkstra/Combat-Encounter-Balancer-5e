@@ -1,4 +1,6 @@
 (() => { 
+    const folderNames = [];
+
     Hooks.once('init', async function() {
         console.log("CEB5e | Init");
 
@@ -24,7 +26,21 @@
                 }, 100); // Adjust timeout as necessary
             }
         });
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Your script here
+        });
         
+        // Example: Assume each `li` under `#directory-list` contains the folder name as text content.
+        // First, access the `#directory-list` element
+        const directoryList = document.querySelector('#directory-list');
+        
+        // Collect the data from each `li` element
+        directoryList.querySelectorAll('li').forEach(li => {
+            // Assuming the folder name you want is the direct text content of `li`
+            const folderName = li.textContent.trim();
+            folderNames.push(folderName);
+        });
     });
 
 
@@ -37,28 +53,15 @@ async function openCustomDialog() {
     // Assuming you're within an async function
     console.log("CEB5e | openCustomDialog() called")
 
-    // Example: Assume each `li` under `#directory-list` contains the folder name as text content.
-    // First, access the `#directory-list` element
-    const directoryList = document.querySelector('#directory-list');
-
-    // Collect the data from each `li` element
-    const folderNames = [];
-    directoryList.querySelectorAll('li').forEach(li => {
-        // Assuming the folder name you want is the direct text content of `li`
-        const folderName = li.textContent.trim();
-        folderNames.push(folderName);
-    });
-
-    
     const htmlContent = `
                         <form>
                             <div class="form-group">
                                 <label>Select Enemy Folder:</label>
-                                <select id="enemy-folder-select">${folderOptions}</select>
+                                <select id="enemy-folder-select">${folderNames}</select>
                             </div>
                             <div class="form-group">
                                 <label>Select Ally Folder:</label>
-                                <select id="ally-folder-select">${folderOptions}</select>
+                                <select id="ally-folder-select">${folderNames}</select>
                             </div>
                         </form>
                         `
@@ -69,13 +72,13 @@ async function openCustomDialog() {
             select: {
             label: "Select",
             callback: html => {
-                const selectedEnemyFolder = html.find("#enemy-folder-select").val();
-                const selectedAllyFolder = html.find("#ally-folder-select").val();
-            }
+                // const selectedEnemyFolder = html.find("#enemy-folder-select").val();
+                // const selectedAllyFolder = html.find("#ally-folder-select").val();
+                }
             }
         },
         default: "select"
-        });
+    });
     dialog.render(true);
 
     // Now populate your dropdowns. Assuming you have two dropdowns for enemy and ally folders
