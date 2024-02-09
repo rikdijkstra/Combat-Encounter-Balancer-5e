@@ -141,3 +141,10 @@ async function openCustomDialog() {
     dialog.render(true);
 }
 
+class Actor {
+    constructor(name, stats, attacks) {
+      this.name = name;
+      this.stats = stats;
+      this.attacks = attacks;
+    }
+  }
