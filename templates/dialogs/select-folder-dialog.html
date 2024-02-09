@@ -1,0 +1,24 @@
+let folderOptions = Object.entries(game.settings.get('yourModuleName', 'folderPaths')).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
+
+let dialogContent = `
+  <form>
+    <div class="form-group">
+      <label>Select Folder:</label>
+      <select id="folder-select">${folderOptions}</select>
+    </div>
+  </form>
+`;
+
+new Dialog({
+  title: "Select Folder",
+  content: dialogContent,
+  buttons: {
+    ok: {
+      label: "Select",
+      callback: (html) => {
+        const selectedFolder = html.find("#folder-select").val();
+        // Now you can use selectedFolder to read files from the server
+      }
+    }
+  }
+}).render(true);

@@ -1,10 +1,10 @@
 {
   "name": "combat-encounter-balancer-5e",
-  "title": "Balance your encounters",
+  "title": "Combat Encounter Balancer 5e",
   "description": "",
   "version": "0.0.1",
-  "minimumCoreVersion": "0.6.2",
-  "compatibleCoreVersion": "0.7.2",
+  "minimumCoreVersion": "11.0.0",
+  "compatibleCoreVersion": "11",
   "author": "Rik Dijkstra <rik.dijkstra@hotmail.com>",
   "dependencies": [
 
