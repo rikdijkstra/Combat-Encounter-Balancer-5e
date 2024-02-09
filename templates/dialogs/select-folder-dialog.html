@@ -1,16 +1,20 @@
-let folderOptions = Object.entries(game.settings.get('yourModuleName', 'folderPaths')).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
+let folderOptions = Object.entries(game.settings.get('combat-encounter-balancer-5e', 'folderPaths')).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
 
-let dialogContent = `
+let dialogContent = '
   <form>
     <div class="form-group">
-      <label>Select Folder:</label>
+      <label>Select Enemy Folder:</label>
       <select id="folder-select">${folderOptions}</select>
     </div>
+    <div class="form-group">
+        <label>Select Allies Folder:</label>
+        <select id="folder-select">${folderOptions}</select>
+      </div>
   </form>
-`;
+';
 
 new Dialog({
-  title: "Select Folder",
+  title: "Select Encounter Folders",
   content: dialogContent,
   buttons: {
     ok: {
