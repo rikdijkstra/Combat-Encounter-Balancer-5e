@@ -5,19 +5,27 @@
     });
 
     Hooks.once('ready', async function() {
-        document.addEventListener('contextmenu', event => {
-            const clickedElement = event.target.closest('.directory-item.folder');
-            if (clickedElement) {
-              // Delay the injection to ensure the default context menu is already built
-              setTimeout(() => {
-                const customOption = document.createElement('li');
-                customOption.className = 'context-item';
-                customOption.innerHTML = '<i class="fas fa-folder-open"></i> Open Custom Dialog';
-                customOption.addEventListener('click', openCustomDialog);
-                document.querySelector('.context-menu').appendChild(customOption);
-              }, 0);
-            }
-          });
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    // Check if the added node is a context menu
+                    // You might need a more specific check here depending on how Foundry VTT marks context menus for folders
+                    if (node.nodeType === 1 && node.matches('.context-menu-selector')) { // Update '.context-menu-selector' as needed
+                        // Ensure this context menu is for a folder, you might need additional checks here
+                        const customOption = document.createElement('li');
+                        customOption.className = 'context-item';
+                        customOption.innerHTML = '<i class="fas fa-folder-open"></i> Open Custom Dialog';
+                        customOption.onclick = openCustomDialog;
+                        node.appendChild(customOption);
+                    }
+                });
+            });
+        });
+    
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
           
 
         Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
