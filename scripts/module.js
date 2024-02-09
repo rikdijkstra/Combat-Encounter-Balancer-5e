@@ -16,7 +16,7 @@
                         const customButton = $('<button class="custom-action"><i class="fas fa-magic"></i> Balance Encounter</button>');
                         customButton.on('click', function() {
                             // Custom button action
-                            console.log('Balance Encounter Triggered');
+                            console.log('CEB5e | Balance Encounter Triggered');
                             openCustomDialog();
                         });
                         actorsHeader.append(customButton);
