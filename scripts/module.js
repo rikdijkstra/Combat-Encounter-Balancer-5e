@@ -1,11 +1,15 @@
 (() => { 
+    console.log("TESTLOG");
     Hooks.once('init', async function() {
-        console.log("INIT HOOK TRIGGERED")
+        console.log("INIT HOOK TRIGGERED");
+        console.info("INIT HOOK TRIGGERED");
+
     });
 
     Hooks.once('ready', async function() {
         Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
-            console.log("hook triggered!")
+            console.log("hook triggered!");
+            console.info("hook triggered!");
             contextOptions.push({
                 name: "Open Custom Dialog",
                 icon: '<i class="fas fa-folder-open"></i>',
@@ -25,6 +29,7 @@
         // Render the template HTML in a dialog
         // Assuming you're within an async function
         const templatePath = "modules/combat-encounter-balancer-5e/templates/dialogs/select-folder-dialog.html";
+        const response = await fetch(templatePath);
         const templateHtml = await fetch(templatePath).then(response => response.text());
         console.log("openCustomDialog() called")
         let dialog = new Dialog({
