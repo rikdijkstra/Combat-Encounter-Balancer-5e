@@ -13,10 +13,11 @@
                     const actorsHeader = $('#actors .directory-header .header-actions.action-buttons.flexrow');
                     if (actorsHeader.length > 0 && !actorsHeader.find('.custom-action').length) {
                         // Create the button if it doesn't already exist
-                        const customButton = $('<button class="custom-action"><i class="fas fa-magic"></i> Custom Action</button>');
+                        const customButton = $('<button class="custom-action"><i class="fas fa-magic"></i> Balance Encounter</button>');
                         customButton.on('click', function() {
                             // Custom button action
-                            console.log('Custom action button clicked');
+                            console.log('Balance Encounter Triggered');
+                            openCustomDialog();
                         });
                         actorsHeader.append(customButton);
                     }
@@ -52,24 +53,3 @@ async function openCustomDialog() {
         });
     dialog.render(true);
 }
-
-// class CustomActorSheet extends ActorSheet {
-//     get template() {
-//         // Return the path to your actor sheet template
-//     }
-
-//     static get defaultOptions() {
-//         return mergeObject(super.defaultOptions, {
-//             // Your options here
-//         });
-//     }
-
-//     activateListeners(html) {
-//         super.activateListeners(html);
-//         html.find(".your-custom-button-class").click(ev => {
-//             openCustomDialog();
-//         });
-//     }
-
-//     // Additional methods as needed
-// }
