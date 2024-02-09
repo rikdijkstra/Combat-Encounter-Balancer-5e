@@ -5,41 +5,25 @@
     });
 
     Hooks.once('ready', async function() {
-        // Wait for the UI to be fully loaded
-        setTimeout(() => {
-            // Find the container for the action buttons in the actors directory header
-            const actionsContainer = document.querySelector('.directory-header .header-actions.action-buttons.flexrow');
-
-            if (actionsContainer) {
-                // Create the new button
-                const customButton = document.createElement('button');
-                customButton.className = 'custom-action';
-                customButton.innerHTML = '<i class="fas fa-magic"></i> Custom Action';
-                
-                // Add an event listener for your custom button action
-                customButton.addEventListener('click', () => {
-                    console.log('Custom action button clicked');
-                    // Place your custom action code here
-                });
-
-                // Append the new button to the actions container
-                actionsContainer.appendChild(customButton);
+        $(document).on('click', '#sidebar-tabs a.item', function() {
+            // Check if the actors tab is activated
+            if ($(this).data('tab') === 'actors') {
+                // Wait a short time to ensure the actors content is loaded
+                setTimeout(() => {
+                    const actorsHeader = $('#actors .directory-header .header-actions.action-buttons.flexrow');
+                    if (actorsHeader.length > 0 && !actorsHeader.find('.custom-action').length) {
+                        // Create the button if it doesn't already exist
+                        const customButton = $('<button class="custom-action"><i class="fas fa-magic"></i> Custom Action</button>');
+                        customButton.on('click', function() {
+                            // Custom button action
+                            console.log('Custom action button clicked');
+                        });
+                        actorsHeader.append(customButton);
+                    }
+                }, 100); // Adjust timeout as necessary
             }
-        }, 500);
-          
-
-        Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
-            console.log("CEB5e |hook triggered!");
-            contextOptions.push({
-                name: "Open Custom Dialog",
-                icon: '<i class="fas fa-folder-open"></i>',
-                condition: li => true, // This function determines when the menu option is available
-                callback: li => {
-                    // Your function to open the dialog
-                    openCustomDialog();
-                }
-            });
         });
+        
     });
 
 
