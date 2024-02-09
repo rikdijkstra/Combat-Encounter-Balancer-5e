@@ -33,16 +33,24 @@ async function openCustomDialog() {
     // Assuming you're within an async function
     console.log("CEB5e | openCustomDialog() called")
 
-    // Example: Assume each `li` under `#directory-list` contains the folder name as text content.
-    // First, access the `#directory-list` element
-    // This assumes you want to target the "directory-list" within the "Actors" tab, for example.
+    // Attempt to locate the directory list within the specified actors section
+    const directoryList = document.querySelector("#ui-right #sidebar #actors .directory-list");
     let folderNames = [];
-    directoryList.querySelectorAll('li[data-folder-depth="1"]').forEach(folder => {
-        // Extract the folder name. Assuming the folder name is within a <h3> tag or similar
-        const folderName = folder.querySelector('header.folder-header h3').textContent.trim();
-        folderNames.push(folderName);
-    });  
 
+    if (directoryList) {
+        console.log("CEB5e | Directory list found.");
+
+        // Select only the direct children 'li' elements of the directory list that are top-level folders
+        directoryList.querySelectorAll('li[data-folder-depth="1"]').forEach(folder => {
+            // Extract the folder name. Assuming the folder name is within a <h3> tag or similar
+            const folderName = folder.querySelector('header.folder-header h3').textContent.trim();
+            folderNames.push(folderName);
+        });
+
+        console.log("CEB5e | Top-level folder names:", folderNames);
+    } else {
+        console.log("CEB5e | Directory list not found. Ensure you are targeting the correct element and it exists in the DOM.");
+    }
     const htmlContent = `
                         <form>
                             <div class="form-group">
