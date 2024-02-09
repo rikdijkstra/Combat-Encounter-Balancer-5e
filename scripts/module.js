@@ -9,6 +9,7 @@ Hooks.once('ready', async function() {
 });
 
 Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
+    console.log("hook triggered!")
     contextOptions.push({
         name: "Open Custom Dialog",
         icon: '<i class="fas fa-folder-open"></i>',
@@ -26,6 +27,7 @@ async function openCustomDialog() {
     // Assuming you're within an async function
     const templatePath = "modules/combat-encounter-balancer-5e/templates/dialogs/select-folder-dialog.html";
     const templateHtml = await fetch(templatePath).then(response => response.text());
+    console.log("openCustomDialog() called")
     let dialog = new Dialog({
         title: "Select Folder",
         content: templateHtml,
@@ -42,23 +44,23 @@ async function openCustomDialog() {
     dialog.render(true);
 }
 
-class CustomActorSheet extends ActorSheet {
-    get template() {
-        // Return the path to your actor sheet template
-    }
+// class CustomActorSheet extends ActorSheet {
+//     get template() {
+//         // Return the path to your actor sheet template
+//     }
 
-    static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
-            // Your options here
-        });
-    }
+//     static get defaultOptions() {
+//         return mergeObject(super.defaultOptions, {
+//             // Your options here
+//         });
+//     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
-        html.find(".your-custom-button-class").click(ev => {
-            openCustomDialog();
-        });
-    }
+//     activateListeners(html) {
+//         super.activateListeners(html);
+//         html.find(".your-custom-button-class").click(ev => {
+//             openCustomDialog();
+//         });
+//     }
 
-    // Additional methods as needed
-}
+//     // Additional methods as needed
+// }
