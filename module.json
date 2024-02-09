@@ -2,7 +2,7 @@
   "name": "combat-encounter-balancer-5e",
   "title": "Combat Encounter Balancer 5e",
   "description": "",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "minimumCoreVersion": "11.0.0",
   "compatibleCoreVersion": "11",
   "author": "Rik Dijkstra <rik.dijkstra@hotmail.com>",
