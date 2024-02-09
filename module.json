@@ -2,7 +2,7 @@
   "name": "combat-encounter-balancer-5e",
   "title": "Combat Encounter Balancer 5e",
   "description": "A combat encounter balancer for the DnD 5e Game System. The balancer works using simplified simulations rather than using classical XP or CR based formulas.",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "minimumCoreVersion": "11.0.0",
   "compatibleCoreVersion": "11",
   "author": "Rik Dijkstra <rik.dijkstra@hotmail.com>",
