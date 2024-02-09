@@ -1,6 +1,5 @@
 (() => { 
-    var folderNames = [];
-
+    var folderNames
     Hooks.once('init', async function() {
         console.log("CEB5e | Init");
 
@@ -29,23 +28,18 @@
 
         document.addEventListener('DOMContentLoaded', (event) => {
             // Your script here
-        });
-        
-        // Example: Assume each `li` under `#directory-list` contains the folder name as text content.
-        // First, access the `#directory-list` element
-        const directoryList = document.querySelector('#directory-list');
-        
-        // Collect the data from each `li` element
-        directoryList.querySelectorAll('li').forEach(li => {
-            // Assuming the folder name you want is the direct text content of `li`
-            const folderName = li.textContent.trim();
-            folderNames.push(folderName);
-        });
+            // Example: Assume each `li` under `#directory-list` contains the folder name as text content.
+            // First, access the `#directory-list` element
+            const directoryList = document.querySelector('#directory-list');
+            folderNames = [];
+            // Collect the data from each `li` element
+            directoryList.querySelectorAll('li').forEach(li => {
+                // Assuming the folder name you want is the direct text content of `li`
+                const folderName = li.textContent.trim();
+                folderNames.push(folderName);
+            });
+        });      
     });
-
-
-
-
 })();
 async function openCustomDialog() {
     // Assuming you have a Dialog subclass or a similar setup
