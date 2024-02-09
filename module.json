@@ -1,11 +1,11 @@
 {
-  "name": "module",
-  "title": "New Module",
+  "name": "Combat Encounter Balancer %e",
+  "title": "Balance your encounters",
   "description": "",
   "version": "0.0.1",
   "minimumCoreVersion": "0.6.2",
   "compatibleCoreVersion": "0.7.2",
-  "author": "Cody Swendrowski <cody@swendrowski.us>",
+  "author": "Rik Dijkstra <rik.dijkstra@hotmail.com>",
   "dependencies": [
 
   ],
@@ -20,7 +20,7 @@
   ],
   "languages": [
   ],
-  "url": "https://github.com/cswendrowski/FoundryVTT-module",
-  "manifest": "https://github.com/cswendrowski/FoundryVTT-module/releases/download/latest/module.json",
-  "download": "https://github.com/cswendrowski/FoundryVTT-module/releases/download/0.0.1/module.zip"
+  "url": "https://github.com/rikdijkstra/Combat-Encounter-Balancer-5e",
+  "manifest": "https://github.com/rikdijkstra/Combat-Encounter-Balancer-5e/releases/download/latest/module.json",
+  "download": "https://github.com/rikdijkstra/Combat-Encounter-Balancer-5e/releases/download/0.0.1/module.zip"
 }
