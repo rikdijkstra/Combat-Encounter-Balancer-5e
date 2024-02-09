@@ -63,25 +63,7 @@ async function openCustomDialog() {
                             </div>
                         </form>
                         `
-    let dialog = new Dialog({
-        title: "Select Encounter Folders",
-        content: htmlContent,
-        buttons: {
-            select: {
-            label: "Select",
-            callback: html => {
-                // const selectedEnemyFolder = html.find("#enemy-folder-select").val();
-                // const selectedAllyFolder = html.find("#ally-folder-select").val();
-                }
-            }
-        },
-        default: "select"
-    });
-    dialog.render(true);
-
-    // Now populate your dropdowns. Assuming you have two dropdowns for enemy and ally folders
-    const enemyFolderSelect = document.querySelector('#enemy-folder-select');
-    const allyFolderSelect = document.querySelector('#ally-folder-select');
+    
 
     // Helper function to populate a select dropdown
     function populateSelect(selectElement, options) {
@@ -92,8 +74,31 @@ async function openCustomDialog() {
             selectElement.appendChild(optionElement);
         });
     }
+    let dialog = new Dialog({
+        title: "Select Encounter Folders",
+        content: htmlContent,
+        buttons: {
+            select: {
+                label: "Select",
+                callback: html => {
+                    // Handle selection
+                }
+            }
+        },
+        default: "select",
+        render: html => {
+            // This is where you ensure the dialog content is in the DOM
+            setTimeout(() => {
+                const enemyFolderSelect = document.querySelector('#enemy-folder-select');
+                const allyFolderSelect = document.querySelector('#ally-folder-select');
+                // Now you can safely manipulate these elements
+                
+                // Populate both selects with the folder names
+                populateSelect(enemyFolderSelect, folderNames);
+                populateSelect(allyFolderSelect, folderNames);
+            }, 100); // Delay might need adjustment
+        }
+    });
 
-    // Populate both selects with the folder names
-    populateSelect(enemyFolderSelect, folderNames);
-    populateSelect(allyFolderSelect, folderNames);
+    dialog.render(true);
 }
