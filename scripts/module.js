@@ -1,15 +1,13 @@
 (() => { 
     console.log("TESTLOG");
     Hooks.once('init', async function() {
-        console.log("INIT HOOK TRIGGERED");
-        console.info("INIT HOOK TRIGGERED");
+        console.log("CEB5e | Init");
 
     });
 
     Hooks.once('ready', async function() {
         Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
-            console.log("hook triggered!");
-            console.info("hook triggered!");
+            console.log("CEB5e |hook triggered!");
             contextOptions.push({
                 name: "Open Custom Dialog",
                 icon: '<i class="fas fa-folder-open"></i>',
