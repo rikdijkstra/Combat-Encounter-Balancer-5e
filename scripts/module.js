@@ -36,7 +36,20 @@ async function openCustomDialog() {
     // Render the template HTML in a dialog
     // Assuming you're within an async function
     console.log("CEB5e | openCustomDialog() called")
-    let folderOptions = Object.entries(game.settings.get('combat-encounter-balancer-5e', 'folderPaths')).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
+
+    // Example: Assume each `li` under `#directory-list` contains the folder name as text content.
+    // First, access the `#directory-list` element
+    const directoryList = document.querySelector('#directory-list');
+
+    // Collect the data from each `li` element
+    const folderNames = [];
+    directoryList.querySelectorAll('li').forEach(li => {
+        // Assuming the folder name you want is the direct text content of `li`
+        const folderName = li.textContent.trim();
+        folderNames.push(folderName);
+    });
+
+    
     const htmlContent = `
                         <form>
                             <div class="form-group">
@@ -64,4 +77,22 @@ async function openCustomDialog() {
         default: "select"
         });
     dialog.render(true);
+
+    // Now populate your dropdowns. Assuming you have two dropdowns for enemy and ally folders
+    const enemyFolderSelect = document.querySelector('#enemy-folder-select');
+    const allyFolderSelect = document.querySelector('#ally-folder-select');
+
+    // Helper function to populate a select dropdown
+    function populateSelect(selectElement, options) {
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.textContent = option;
+            selectElement.appendChild(optionElement);
+        });
+    }
+
+    // Populate both selects with the folder names
+    populateSelect(enemyFolderSelect, folderNames);
+    populateSelect(allyFolderSelect, folderNames);
 }
