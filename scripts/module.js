@@ -36,13 +36,22 @@ async function openCustomDialog() {
     // Render the template HTML in a dialog
     // Assuming you're within an async function
     console.log("CEB5e | openCustomDialog() called")
-    const templatePath = "modules/combat-encounter-balancer-5e/templates/dialogs/select-folder-dialog.html";
-    const templateHtml = await fetch(templatePath).then(response => response.text()).catch(err => console.error(err));        console.log("openCustomDialog() called")
     let folderOptions = Object.entries(game.settings.get('combat-encounter-balancer-5e', 'folderPaths')).map(([key, value]) => `<option value="${key}">${value}</option>`).join('');
-    dialogContent = dialogContent.replace(/\$\{folderOptions\}/g, folderOptions);
+    const htmlContent = `
+                        <form>
+                            <div class="form-group">
+                                <label>Select Enemy Folder:</label>
+                                <select id="enemy-folder-select">${folderOptions}</select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Ally Folder:</label>
+                                <select id="ally-folder-select">${folderOptions}</select>
+                            </div>
+                        </form>
+                        `
     let dialog = new Dialog({
         title: "Select Encounter Folders",
-        content: templateHtml,
+        content: htmlContent,
         buttons: {
             select: {
             label: "Select",
