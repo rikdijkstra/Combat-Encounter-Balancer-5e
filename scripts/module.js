@@ -1,5 +1,5 @@
 (() => { 
-    const folderNames = [];
+    var folderNames = [];
 
     Hooks.once('init', async function() {
         console.log("CEB5e | Init");
