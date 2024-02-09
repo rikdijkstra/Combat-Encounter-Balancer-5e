@@ -36,17 +36,12 @@ async function openCustomDialog() {
     // Example: Assume each `li` under `#directory-list` contains the folder name as text content.
     // First, access the `#directory-list` element
     // This assumes you want to target the "directory-list" within the "Actors" tab, for example.
-    const actorsTab = document.querySelector("#ui-right #sidebar #actors .directory-list");
     let folderNames = [];
-    if (actorsTab) {
-        actorsTab.querySelectorAll('li').forEach(li => {
-            const folderName = li.textContent.trim();
-            folderNames.push(folderName);
-        });
-        console.log(folderNames); // Do something with the folder names
-    } else {
-        console.log('The desired directory list could not be found.');
-    }    
+    directoryList.querySelectorAll('li[data-folder-depth="1"]').forEach(folder => {
+        // Extract the folder name. Assuming the folder name is within a <h3> tag or similar
+        const folderName = folder.querySelector('header.folder-header h3').textContent.trim();
+        folderNames.push(folderName);
+    });  
 
     const htmlContent = `
                         <form>
