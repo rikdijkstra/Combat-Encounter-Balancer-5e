@@ -27,6 +27,20 @@
     });
 })();
 
+// Retrieve all actors that are in the specified folder
+function loadActorsFromFolder(folderId) {
+    // This will filter the actors collection to find those with the folder ID matching 'folderId'
+    const actorsInFolder = game.actors.filter(actor => actor.data.folder === folderId);
+    return actorsInFolder;
+}
+
+// Balance folders
+function balance(selectedEnemyFolderName, selectedEnemyFolderID, selectedAllyFolderName, selectedAllyFolderID){
+    let enemies = loadActorsFromFolder(selectedEnemyFolderID);
+    let allies = loadActorsFromFolder(selectedAllyFolderID);
+    console.log("CED5e| Balancing started");
+}
+
 async function openCustomDialog() {
     // Assuming you have a Dialog subclass or a similar setup
     // Render the template HTML in a dialog
@@ -35,22 +49,27 @@ async function openCustomDialog() {
 
     // Attempt to locate the directory list within the specified actors section
     const directoryList = document.querySelector("#ui-right #sidebar #actors .directory-list");
-    let folderNames = [];
-
+    let folders = {}; // Use an object to map folder names to their IDs
     if (directoryList) {
         console.log("CEB5e | Directory list found.");
 
-        // Select only the direct children 'li' elements of the directory list that are top-level folders
+         // Select only the direct children 'li' elements of the directory list that are top-level folders
         directoryList.querySelectorAll('li[data-folder-depth="1"]').forEach(folder => {
             // Extract the folder name. Assuming the folder name is within a <h3> tag or similar
             const folderName = folder.querySelector('header.folder-header h3').textContent.trim();
-            folderNames.push(folderName);
+
+            // Directly extract the folder ID from the folder element
+            const folderID = folder.getAttribute('data-folder-id');
+
+            // Map the folder name to its ID in the folders object
+            folders[folderName] = folderID;
         });
 
         console.log("CEB5e | Top-level folder names:", folderNames);
     } else {
         console.log("CEB5e | Directory list not found. Ensure you are targeting the correct element and it exists in the DOM.");
     }
+    const folderNames = Object.keys(folders);
     const htmlContent = `
                         <form>
                             <div class="form-group">
@@ -74,6 +93,7 @@ async function openCustomDialog() {
             selectElement.appendChild(optionElement);
         });
     }
+    
     let dialog = new Dialog({
         title: "Select Encounter Folders",
         content: htmlContent,
@@ -81,7 +101,16 @@ async function openCustomDialog() {
             select: {
                 label: "Select",
                 callback: html => {
-                    // Handle selection
+                     // Use jQuery or equivalent to get selected option's text (folder name)
+                    const selectedEnemyFolderName = html.find("#enemy-folder-select option:selected").text();
+                    const selectedAllyFolderName = html.find("#ally-folder-select option:selected").text();
+
+                    // Lookup folder IDs from the folders dictionary
+                    const selectedEnemyFolderID = folders[selectedEnemyFolderName];
+                    const selectedAllyFolderID = folders[selectedAllyFolderName];
+
+                    // Call balance with folder names and IDs
+                    balance(selectedEnemyFolderName, selectedEnemyFolderID, selectedAllyFolderName, selectedAllyFolderID);
                 }
             }
         },
@@ -102,3 +131,4 @@ async function openCustomDialog() {
 
     dialog.render(true);
 }
+
