@@ -28,16 +28,16 @@
 })();
 
 // Retrieve all actors that are in the specified folder
-function loadActorsFromFolder(folderId) {
+function loadActorsFromFolder(actorIDs) {
     // This will filter the actors collection to find those with the folder ID matching 'folderId'
-    const actorsInFolder = game.actors.filter(actor => actor.data.folder === folderId);
+    const actorsInFolder = game.actors.filter(actor => actorIDs.includes(actor.key));
     return actorsInFolder;
 }
 
 // Balance folders
-function balance(selectedEnemyFolderName, selectedEnemyFolderID, selectedAllyFolderName, selectedAllyFolderID){
-    let enemies = loadActorsFromFolder(selectedEnemyFolderID);
-    let allies = loadActorsFromFolder(selectedAllyFolderID);
+function balance(selectedEnemyFolderName, enemyIDs, selectedAllyFolderName, allyIDs){
+    let enemies = loadActorsFromFolder(enemyIDs);
+    let allies = loadActorsFromFolder(allyIDs);
     console.log("CED5e| Balancing started");
 }
 
@@ -58,11 +58,17 @@ async function openCustomDialog() {
             // Extract the folder name. Assuming the folder name is within a <h3> tag or similar
             const folderName = folder.querySelector('header.folder-header h3').textContent.trim();
 
-            // Directly extract the folder ID from the folder element
-            const folderID = folder.getAttribute('data-folder-id');
+            // Initialize an empty array to hold the document IDs for this folder
+            let documentIDs = [];
 
-            // Map the folder name to its ID in the folders object
-            folders[folderName] = folderID;
+            // Find all document 'li' elements within the folder and extract their data-document-id attributes
+            folder.querySelectorAll('.subdirectory .directory-item.document').forEach(document => {
+                const documentID = document.getAttribute('data-document-id');
+                documentIDs.push(documentID);
+            });
+
+            // Map the folder name to its list of document IDs in the folders object
+            folders[folderName] = documentIDs;
         });
 
         console.log("CEB5e | Top-level folder names:", Object.keys(folders));
@@ -106,11 +112,11 @@ async function openCustomDialog() {
                     const selectedAllyFolderName = html.find("#ally-folder-select option:selected").text();
 
                     // Lookup folder IDs from the folders dictionary
-                    const selectedEnemyFolderID = folders[selectedEnemyFolderName];
-                    const selectedAllyFolderID = folders[selectedAllyFolderName];
+                    const enemyIDs = folders[selectedEnemyFolderName];
+                    const allyIDs = folders[selectedAllyFolderName];
 
                     // Call balance with folder names and IDs
-                    balance(selectedEnemyFolderName, selectedEnemyFolderID, selectedAllyFolderName, selectedAllyFolderID);
+                    balance(selectedEnemyFolderName, enemyIDs, selectedAllyFolderName, allyIDs);
                 }
             }
         },
