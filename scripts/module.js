@@ -1,11 +1,25 @@
 (() => { 
-    console.log("TESTLOG");
     Hooks.once('init', async function() {
         console.log("CEB5e | Init");
 
     });
 
     Hooks.once('ready', async function() {
+        document.addEventListener('contextmenu', event => {
+            const clickedElement = event.target.closest('.directory-item.folder');
+            if (clickedElement) {
+              // Delay the injection to ensure the default context menu is already built
+              setTimeout(() => {
+                const customOption = document.createElement('li');
+                customOption.className = 'context-item';
+                customOption.innerHTML = '<i class="fas fa-folder-open"></i> Open Custom Dialog';
+                customOption.addEventListener('click', openCustomDialog);
+                document.querySelector('.context-menu').appendChild(customOption);
+              }, 0);
+            }
+          });
+          
+
         Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
             console.log("CEB5e |hook triggered!");
             contextOptions.push({
@@ -26,10 +40,9 @@
         // Assuming you have a Dialog subclass or a similar setup
         // Render the template HTML in a dialog
         // Assuming you're within an async function
+        console.log("CEB5e | openCustomDialog() called")
         const templatePath = "modules/combat-encounter-balancer-5e/templates/dialogs/select-folder-dialog.html";
-        const response = await fetch(templatePath);
-        const templateHtml = await fetch(templatePath).then(response => response.text());
-        console.log("openCustomDialog() called")
+        const templateHtml = await fetch(templatePath).then(response => response.text()).catch(err => console.error(err));        console.log("openCustomDialog() called")
         let dialog = new Dialog({
             title: "Select Folder",
             content: templateHtml,
