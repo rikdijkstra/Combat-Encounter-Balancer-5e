@@ -30,7 +30,10 @@
 // Retrieve all actors that are in the specified folder
 function loadActorsFromFolder(actorIDs) {
     // This will filter the actors collection to find those with the folder ID matching 'folderId'
-    const actorsInFolder = game.actors.filter(actor => actorIDs.includes(actor.key));
+    let actorsInFolder = [];
+    actorIDs.forEach(actorID => {
+        actorsInFolder.push(game.actors[actorID])
+    });
     return actorsInFolder;
 }
 
