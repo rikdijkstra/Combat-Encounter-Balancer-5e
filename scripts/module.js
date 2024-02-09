@@ -1,25 +1,25 @@
 (() => { })();
 
 Hooks.once('init', async function() {
-    
+    console.log("INIT HOOK TRIGGERED")
 });
 
 Hooks.once('ready', async function() {
-
-});
-
-Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
-    console.log("hook triggered!")
-    contextOptions.push({
-        name: "Open Custom Dialog",
-        icon: '<i class="fas fa-folder-open"></i>',
-        condition: li => true, // This function determines when the menu option is available
-        callback: li => {
-            // Your function to open the dialog
-            openCustomDialog();
-        }
+    Hooks.on('getActorDirectoryEntryContext', (html, contextOptions) => {
+        console.log("hook triggered!")
+        contextOptions.push({
+            name: "Open Custom Dialog",
+            icon: '<i class="fas fa-folder-open"></i>',
+            condition: li => true, // This function determines when the menu option is available
+            callback: li => {
+                // Your function to open the dialog
+                openCustomDialog();
+            }
+        });
     });
 });
+
+
 
 async function openCustomDialog() {
     // Assuming you have a Dialog subclass or a similar setup
