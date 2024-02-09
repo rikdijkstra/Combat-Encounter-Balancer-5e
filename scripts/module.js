@@ -65,7 +65,7 @@ async function openCustomDialog() {
             folders[folderName] = folderID;
         });
 
-        console.log("CEB5e | Top-level folder names:", folderNames);
+        console.log("CEB5e | Top-level folder names:", Object.keys(folders));
     } else {
         console.log("CEB5e | Directory list not found. Ensure you are targeting the correct element and it exists in the DOM.");
     }
