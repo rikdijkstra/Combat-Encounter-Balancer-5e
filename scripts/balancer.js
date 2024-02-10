@@ -31,11 +31,31 @@ function importJsonFiles(dirPath) {
 
 
 class Actor{
-    constructor(name, stats, actions){
+    constructor(name, type, stats, actions, spellSlots, legendaryActions){
         this.name = name;
+        this.type = type;
         this.stats = stats;
-        this.abilities = actions;
+        this.actions = actions;
+        this.spellSlots = spellSlots;
+        this.legendaryActions = legendaryActions;
     }
+}
+
+class Action{
+    // str, int, [action, bonusaction, legendary, spellslotlevel] e.g.[1, 0, 0, 2] for a 2nd level spell, or [1, 0, 0, -1] for a regular attack
+    constructor(name, damage, cost){
+        this.name = name;
+        this.damage = damage;
+        this.cost = cost
+    }
+}
+
+function runSimulations(allies, enemies, amount=1000){
+
+}
+
+function getMod(score){
+    return Math.floor((score-10)/2);
 }
 
 function getAllAbilityValues(data) {
@@ -49,28 +69,60 @@ function getAllAbilityValues(data) {
     }
   
     return values;
-  }
+}
+
+function acFromAcEffects(acEffects, dex = 0){
+    var value = acEffects[0].changes[acEffects[0].changes.length - 1].value
+    if (typeof value === 'number' && Number.isInteger(value)){
+        return value
+    }
+    else if (typeof value === 'string' && value.includes("+")){
+        let split = value.split("+")
+        const acvalue = split[0]
+        const mod = split[split.length - 1]
+        if (mod.includes("dex")){
+            return parseInt(acvalue) + getMod(dex)
+        }
+        else{
+            console.error("No dex in formula, unsure what to do. Formula:", value)
+        }
+    }
+}
 
 function initializeAndLoadActors(){
-    const allJsonData = importJsonFiles(jsonDirPathEnemies);
-    let actors = []
+    const enemyJsonData = importJsonFiles(jsonDirPathEnemies);
+    const allyJsonData = importJsonFiles(jsonDirPathAllies);
+    let enemies = []
+    let allies = []
     // import enemies
-    allJsonData.forEach(jsondata =>
+    enemyJsonData.forEach(jsondata =>
         {
             let name = jsondata.name
             let stats = getAllAbilityValues(jsondata)
             stats["ac"] = jsondata.system.attributes.ac.flat
             stats["hp"] = jsondata.system.attributes.hp.value
             let actions = jsondata.items
-            actors.push(new Actor(name, stats, actions))
+            enemies.push(new Actor(name, "enemy", stats, actions))
         }
     )
-    return actors
+    // import allies
+    allyJsonData.forEach(jsondata =>
+        {
+            let name = jsondata.name
+            let stats = getAllAbilityValues(jsondata)
+            let acEffects = jsondata.flags.ddbimporter.acEffects
+            stats["ac"] = acFromAcEffects(acEffects, stats.dex)
+            stats["hp"] = jsondata.system.attributes.hp.value
+            let actions = jsondata.items
+            allies.push(new Actor(name, "enemy", stats, actions))
+        }
+    )
+    return {"enemies": enemies, "allies": allies}
 }
 
 const actors = initializeAndLoadActors()
 
-actors.forEach(actor => {
+actors.allies.forEach(actor => {
     console.log(actor.name, actor.stats)
 })
 
