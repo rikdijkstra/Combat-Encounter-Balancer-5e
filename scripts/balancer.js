@@ -31,23 +31,45 @@ function importJsonFiles(dirPath) {
 
 
 class Actor{
-    constructor(name, type, stats, actions, spellSlots, legendaryActions){
+    constructor(name, type, stats, numAttacks, actions, spellSlots, legendaryActions){
         this.name = name;
-        this.type = type;
-        this.stats = stats;
-        this.actions = actions;
-        this.spellSlots = spellSlots;
-        this.legendaryActions = legendaryActions;
+        this.type = type; // ally or enemy
+        this.stats = stats; // ability scores, hp, ac
+        this.numAttacks = numAttacks; // amount of attacks
+        this.actions = actions; // all available heals / actions
+        this.spellSlots = spellSlots; // available spell slots
+        this.legendaryActions = legendaryActions; // amount of legendary actions
     }
 }
 
 class Action{
-    // str, int, [action, bonusaction, legendary, spellslotlevel] e.g.[1, 0, 0, 2] for a 2nd level spell, or [1, 0, 0, -1] for a regular attack
-    constructor(name, damage, cost){
+    // cost: [action, bonusaction, legendary, spellslotlevel] e.g.[1, 0, 0, 2] for a 2nd level spell, or [1, 0, 0, 0] for a regular attack
+    // type: "damage" || "health"
+    // if uses are unlimited, -1
+    constructor(name, type, cost, uses, recharge, dieCount, dieSides){
         this.name = name;
-        this.damage = damage;
-        this.cost = cost
+        this.type = type;
+        this.cost = cost;
+        this.uses = uses;
+        this.recharge = recharge; //if it's a recharging move, the amount from which the move recharges, e.g. 5 for recharges on 5&6, else 0
+        this.diceCount = dieCount;
+        this.dieSides = dieSides;
     }
+
+    // Function to roll a single die
+    rollDie(sides) {
+        return Math.floor(Math.random() * sides) + 1;
+    }
+
+    // Getter for damage / health that simulates $dieCount $dieSides-sided dice rolls
+    get result() {
+        let totalDamage = 0;
+        for (let i = 0; i < this.diceCount; i++) {
+            totalDamage += this.rollDie(this.dieSides);
+        }
+        return totalDamage;
+    }
+
 }
 
 function runSimulations(allies, enemies, amount=1000){
@@ -69,6 +91,24 @@ function getAllAbilityValues(data) {
     }
   
     return values;
+}
+
+function getActionsFromJSON(data){
+    // for now we are ignoring support spells (aside from heals?)
+    let actions = [];
+    data.forEach(a => {
+        let name, damageString, damageType, type, uses
+        name = a.name
+        if (a.system.damage.parts.length > 0){
+            damageString = a.system.damage.parts[0][0]
+            damageType = a.system.damage.parts[0][1]
+        }
+        // determine how to set "type"
+        // consider what to do with multiattacks (limited information available aside from description)
+        
+    })
+
+    return data
 }
 
 function acFromAcEffects(acEffects, dex = 0){
@@ -101,7 +141,7 @@ function initializeAndLoadActors(){
             let stats = getAllAbilityValues(jsondata)
             stats["ac"] = jsondata.system.attributes.ac.flat
             stats["hp"] = jsondata.system.attributes.hp.value
-            let actions = jsondata.items
+            let actions = getActionsFromJSON(jsondata.items)
             enemies.push(new Actor(name, "enemy", stats, actions))
         }
     )
@@ -113,7 +153,7 @@ function initializeAndLoadActors(){
             let acEffects = jsondata.flags.ddbimporter.acEffects
             stats["ac"] = acFromAcEffects(acEffects, stats.dex)
             stats["hp"] = jsondata.system.attributes.hp.value
-            let actions = jsondata.items
+            let actions = getActionsFromJSON(jsondata.items)
             allies.push(new Actor(name, "enemy", stats, actions))
         }
     )
