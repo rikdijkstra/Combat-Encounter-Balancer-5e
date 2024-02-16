@@ -42,16 +42,14 @@ class Actor{
     }
 }
 
-class Action{
-    // cost: [action, bonusaction, legendary, spellslotlevel] e.g.[1, 0, 0, 2] for a 2nd level spell, or [1, 0, 0, 0] for a regular attack
-    // type: "damage" || "health"
-    // if uses are unlimited, -1
+class Action{   
     constructor(name, type, cost, uses, recharge, dieCount, dieSides){
         this.name = name;
-        this.type = type;
-        this.cost = cost;
-        this.uses = uses;
+        this.type = type;  // type: "damage" || "health"
+        this.cost = cost;  // cost: [action, bonusaction, reaction, legendary, spellslotlevel] e.g.[1, 0, 0, 2] for a 2nd level spell, or [1, 0, 0, 0] for a regular attack
+        this.uses = uses;  // if uses are unlimited, -1
         this.recharge = recharge; //if it's a recharging move, the amount from which the move recharges, e.g. 5 for recharges on 5&6, else 0
+        this.recharged = 1;
         this.diceCount = dieCount;
         this.dieSides = dieSides;
     }
@@ -93,22 +91,86 @@ function getAllAbilityValues(data) {
     return values;
 }
 
+function getCostFromJSON(costjson, level){
+    var cost = [0, 0, 0, 0, 0]
+    const costdict = {
+        "action": [1, 0, 0, 0, 0],
+        "bonus": [0, 1, 0, 0, 0],
+        "reaction": [0, 0, 1, 0, 0],
+        "legendary": [0, 0, 0, 1, 0],
+        "spelllevel": [0, 0, 0, 0, 1]
+    }
+    // What to do with special?
+    if(costjson.type == "none" || costjson.type == ""|| costjson.type == "hour" || costjson.type == "minute"){
+        return cost;
+    }
+    
+    else{
+        costvalue = 0
+        if(!costjson.cost == ""){
+            costvalue = parseInt(costjson.cost);
+        }
+        
+        var cost = costdict[costjson.type].map(function(x) { return x * costvalue; });
+        if(level > 0){
+            cost[4] += level;
+        }
+        return cost
+    }
+    // TODO: cost calc
+}
+
 function getActionsFromJSON(data){
     // for now we are ignoring support spells (aside from heals?)
     let actions = [];
     data.forEach(a => {
-        let name, damageString, damageType, type, uses
+        let name, damageString, damageType, formula, type, actionType, uses, description, recharge, save, target, duration, cost
         name = a.name
-        if (a.system.damage.parts.length > 0){
+        type = a.type
+        if(Object.keys(a.system).includes("actionType")){
+            actionType = a.system.actionType
+        }
+        if(Object.keys(a.system).includes("formula")){
+            formula = a.system.formula
+        }
+        if(Object.keys(a.system).includes("save")){
+            save = a.system.save
+        }
+        if(Object.keys(a.system).includes("target")){
+            target = a.system.target
+        }
+        if(Object.keys(a.system).includes("activation")){
+            level = 0
+            if(Object.keys(a.system).includes("level")){
+                level = a.system.level
+            }
+            cost = getCostFromJSON(a.system.activation, level)
+        }
+        if(Object.keys(a.system).includes("duration")){
+            duration = a.system.duration
+        }
+        if (Object.keys(a.system).includes("damage") && Object.keys(a.system.damage).includes("parts") && a.system.damage.parts.length > 0){
             damageString = a.system.damage.parts[0][0]
             damageType = a.system.damage.parts[0][1]
         }
-        // determine how to set "type"
+        if(Object.keys(a.system.description).includes("value")){
+            description = a.system.description.value
+        }
+        if(Object.keys(a.system).includes("recharge") && Object.keys(a.system.recharge).includes("value")){
+            recharge = a.system.recharge.value
+        }
+        if(Object.keys(a.system).includes("uses") && Object.keys(a.system.uses).includes("value")){
+            uses = a.system.uses.value
+        }
+
+        
+        actions.push(1)
+            // determine how to set "type"
         // consider what to do with multiattacks (limited information available aside from description)
         
     })
 
-    return data
+    return actions
 }
 
 function acFromAcEffects(acEffects, dex = 0){
@@ -141,6 +203,9 @@ function initializeAndLoadActors(){
             let stats = getAllAbilityValues(jsondata)
             stats["ac"] = jsondata.system.attributes.ac.flat
             stats["hp"] = jsondata.system.attributes.hp.value
+            if(Object.keys(jsondata.system.resources).includes("legact")){
+                stats["la"] = jsondata.system.resources.legact.value
+            }
             let actions = getActionsFromJSON(jsondata.items)
             enemies.push(new Actor(name, "enemy", stats, actions))
         }
