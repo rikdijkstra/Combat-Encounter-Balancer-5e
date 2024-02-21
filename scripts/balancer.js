@@ -43,7 +43,7 @@ class Actor{
 }
 
 class Action{   
-    constructor(name, type, cost, uses, recharge, dieCount, dieSides){
+    constructor(name, type, cost, uses, recharge, dieCount, dieSides, plus, damageType){
         this.name = name;
         this.type = type;  // type: "damage" || "health"
         this.cost = cost;  // cost: [action, bonusaction, reaction, legendary, spellslotlevel] e.g.[1, 0, 0, 2] for a 2nd level spell, or [1, 0, 0, 0] for a regular attack
@@ -52,11 +52,13 @@ class Action{
         this.recharged = 1;
         this.diceCount = dieCount;
         this.dieSides = dieSides;
+        this.plus = plus;
+        this.damageType = damageType;
     }
 
     // Function to roll a single die
     rollDie(sides) {
-        return Math.floor(Math.random() * sides) + 1;
+        return Math.ceil(Math.random() * sides);
     }
 
     // Getter for damage / health that simulates $dieCount $dieSides-sided dice rolls
@@ -65,7 +67,7 @@ class Action{
         for (let i = 0; i < this.diceCount; i++) {
             totalDamage += this.rollDie(this.dieSides);
         }
-        return totalDamage;
+        return totalDamage + this.plus;
     }
 
 }
@@ -91,7 +93,7 @@ function getAllAbilityValues(data) {
     return values;
 }
 
-function getCostFromJSON(costjson, level){
+function getCostFromJSON(costjson, level, name){
     var cost = [0, 0, 0, 0, 0]
     const costdict = {
         "action": [1, 0, 0, 0, 0],
@@ -100,8 +102,8 @@ function getCostFromJSON(costjson, level){
         "legendary": [0, 0, 0, 1, 0],
         "spelllevel": [0, 0, 0, 0, 1]
     }
-    // What to do with special?
-    if(costjson.type == "none" || costjson.type == ""|| costjson.type == "hour" || costjson.type == "minute"){
+
+    if(costjson.type == "none" || costjson.type == ""|| costjson.type == "hour" || costjson.type == "minute" || costjson.type == "special"){
         return cost;
     }
     
@@ -117,59 +119,74 @@ function getCostFromJSON(costjson, level){
         }
         return cost
     }
-    // TODO: cost calc
+}
+
+function isNumeric(str) {
+    if (typeof str != "string") return false // we only process strings!  
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+           !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
+
+function getDamageFromDamageString(damageString, damageType, name){
+    if (!damageType || damageString[0] == "@" || damageString[0] == "("){
+        var damage = [0, 0, "0"];
+        return damage;
+    }
+    var dieCount = damageString.split("d")[0]
+    var dieSides = damageString.split("d")[1]
+    if (dieSides){
+        dieSides = dieSides.split(" +")[0]
+        dieSides = dieSides.split("[")[0]
+    }
+    else{
+        var damage = [0, 0, "0"];
+        return damage;
+    }
+    if (!isNumeric(dieCount)){
+        var damage = [0, 0, "0"];
+        return damage;
+    }
+    var plus = "0"
+    if (damageString.includes("+")){
+        plus = damageString.split("+ ")[1]
+    }
+
+    if (dieCount && !dieSides && plus == "0"){
+        plus = toString(dieCount)
+    }
+    var damage = [dieCount, dieSides, plus]
+    return damage
 }
 
 function getActionsFromJSON(data){
-    // for now we are ignoring support spells (aside from heals?)
+    // for now we are ignoring support spells (aside from heals)
     let actions = [];
     data.forEach(a => {
-        let name, damageString, damageType, formula, type, actionType, uses, description, recharge, save, target, duration, cost
-        name = a.name
-        type = a.type
-        if(Object.keys(a.system).includes("actionType")){
-            actionType = a.system.actionType
-        }
-        if(Object.keys(a.system).includes("formula")){
-            formula = a.system.formula
-        }
-        if(Object.keys(a.system).includes("save")){
-            save = a.system.save
-        }
-        if(Object.keys(a.system).includes("target")){
-            target = a.system.target
-        }
-        if(Object.keys(a.system).includes("activation")){
-            level = 0
-            if(Object.keys(a.system).includes("level")){
-                level = a.system.level
+        let { name, type } = a; // Directly destructure common properties
+        let actionType = a.system.actionType ?? null;
+        let formula = a.system.formula ?? null;
+        let save = a.system.save ?? null;
+        let target = a.system.target ?? null;
+        let duration = a.system.duration ?? null;
+        let cost = a.system.activation ? getCostFromJSON(a.system.activation, a.system.level ?? 0, name) : null;
+        let description = a.system.description?.value ?? null;
+        let recharge = a.system.recharge?.value ?? null;
+        let uses = a.system.uses?.value ?? null;
+    
+        // Handling for damage
+        if (a.system.damage?.parts?.length > 0) {
+            let [damageString, damageType = null] = a.system.damage.parts[0];
+            let [dieCount, dieSides, plus] = getDamageFromDamageString(damageString, damageType, name);
+    
+            // Add action only if it has damage (based on your condition)
+            const costsum = cost.reduce((partialSum, a) => partialSum + a, 0);
+            if ((dieCount || dieSides || plus !== "0") && costsum > 0) {
+                actions.push(new Action(name, type, cost, uses, recharge, dieCount, dieSides, plus, damageType));
             }
-            cost = getCostFromJSON(a.system.activation, level)
         }
-        if(Object.keys(a.system).includes("duration")){
-            duration = a.system.duration
-        }
-        if (Object.keys(a.system).includes("damage") && Object.keys(a.system.damage).includes("parts") && a.system.damage.parts.length > 0){
-            damageString = a.system.damage.parts[0][0]
-            damageType = a.system.damage.parts[0][1]
-        }
-        if(Object.keys(a.system.description).includes("value")){
-            description = a.system.description.value
-        }
-        if(Object.keys(a.system).includes("recharge") && Object.keys(a.system.recharge).includes("value")){
-            recharge = a.system.recharge.value
-        }
-        if(Object.keys(a.system).includes("uses") && Object.keys(a.system.uses).includes("value")){
-            uses = a.system.uses.value
-        }
-
-        
-        actions.push(1)
-            // determine how to set "type"
-        // consider what to do with multiattacks (limited information available aside from description)
-        
-    })
-
+    });
+  
+    console.log(actions)
     return actions
 }
 
@@ -206,8 +223,10 @@ function initializeAndLoadActors(){
             if(Object.keys(jsondata.system.resources).includes("legact")){
                 stats["la"] = jsondata.system.resources.legact.value
             }
-            let actions = getActionsFromJSON(jsondata.items)
-            enemies.push(new Actor(name, "enemy", stats, actions))
+            // name, type, stats, numAttacks, actions, spellSlots, legendaryActions
+            // TODO numAttacks, spellSlots, legendaryActions
+            let numAttacks = 1;
+            enemies.push(new Actor(name, "enemy", stats, null, getActionsFromJSON(jsondata.items), null, null))
         }
     )
     // import allies
@@ -218,17 +237,20 @@ function initializeAndLoadActors(){
             let acEffects = jsondata.flags.ddbimporter.acEffects
             stats["ac"] = acFromAcEffects(acEffects, stats.dex)
             stats["hp"] = jsondata.system.attributes.hp.value
-            let actions = getActionsFromJSON(jsondata.items)
-            allies.push(new Actor(name, "enemy", stats, actions))
+            // let actions = getActionsFromJSON(jsondata.items)
+            // TODO: need to set damage for monk actions / modifiers @scale.... etc.
+            allies.push(new Actor(name, "enemy", stats, null, getActionsFromJSON(jsondata.items), null, null))
         }
     )
+    console.log(enemies)
+    console.log(allies)
     return {"enemies": enemies, "allies": allies}
 }
 
 const actors = initializeAndLoadActors()
 
 actors.allies.forEach(actor => {
-    console.log(actor.name, actor.stats)
+    console.log(actor.name, actor.stats, actor)
 })
 
     
